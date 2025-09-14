@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}All Transactions{% endblock %}
+
+{% block content %}
+<div class="transactions-container">
+    <h1>All Transactions</h1>
+    
+    {% if transactions %}
+        <div class="transactions-list">
+            {% for transaction in transactions %}
+                <div class="transaction-item {{ transaction['type'] }}" data-id="{{ transaction['id'] }}">
+                    <div class="transaction-info">
+                        <h3>{{ transaction['title'] }}</h3>
+                        <p>{{ transaction['date'] }} • {{ transaction['description'] or 'No description' }}</p>
+                    </div>
+                    <div class="transaction-amount {% if transaction['type'] == 'income' %}positive{% else %}negative{% endif %}">
+                        {% if transaction['type'] == 'income' %}+{% else %}-{% endif %}Rs{{ "%.2f"|format(transaction['amount']) }}
+                    </div>
+                    <div class="transaction-actions">
+                        <button class="btn-edit" onclick="editTransaction({{ transaction['id'] }})">Edit</button>
+                        <button class="btn-delete" onclick="deleteTransaction({{ transaction['id'] }})">Delete</button>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>No transactions yet. <a href="{{ url_for('add_transaction') }}">Add your first transaction</a></p>
+    {% endif %}
+</div>
+
+<!-- Edit Modal (hidden by default) -->
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Edit Transaction</h2>
+        <form id="editForm">
+            <input type="hidden" id="editId" name="id">
+            
+            <div class="form-group">
+                <label for="editTitle">Title*</label>
+                <input type="text" id="editTitle" name="title" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="editDescription">Description</label>
+                <textarea id="editDescription" name="description" rows="3"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="editAmount">Amount*</label>
+                <input type="number" id="editAmount" name="amount" step="0.01" min="0.01" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="editType">Type*</label>
+                <select id="editType" name="type" required>
+                    <option value="income">Income</option>
+                    <option value="expense">Expense</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="editDate">Date*</label>
+                <input type="date" id="editDate" name="date" required>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Update Transaction</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

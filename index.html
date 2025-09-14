@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <div class="balance-card">
+        <h2>Current Balance</h2>
+        <div class="balance-amount {% if balance >= 0 %}positive{% else %}negative{% endif %}">
+            Rs{{ "%.2f"|format(balance) }}
+        </div>
+    </div>
+
+    <div class="quick-actions">
+        <h2>Quick Actions</h2>
+        <div class="action-buttons">
+            <a href="{{ url_for('add_transaction') }}?type=income" class="btn btn-income">Add Income</a>
+            <a href="{{ url_for('add_transaction') }}?type=expense" class="btn btn-expense">Add Expense</a>
+        </div>
+    </div>
+
+    <div class="recent-transactions">
+        <h2>Recent Transactions</h2>
+        {% if transactions %}
+            <div class="transactions-list">
+                {% for transaction in transactions %}
+                    <div class="transaction-item {{ transaction['type'] }}">
+                        <div class="transaction-info">
+                            <h3>{{ transaction['title'] }}</h3>
+                            <p>{{ transaction['date'] }} • {{ transaction['description'] or 'No description' }}</p>
+                        </div>
+                        <div class="transaction-amount {% if transaction['type'] == 'income' %}positive{% else %}negative{% endif %}">
+                            {% if transaction['type'] == 'income' %}+{% else %}-{% endif %}Rs{{ "%.2f"|format(transaction['amount']) }}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            <a href="{{ url_for('expenses') }}" class="view-all-link">View All Transactions →</a>
+        {% else %}
+            <p>No transactions yet. <a href="{{ url_for('add_transaction') }}">Add your first transaction</a></p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
